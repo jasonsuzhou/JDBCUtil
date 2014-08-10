@@ -1,5 +1,23 @@
 JdbcTemplate with h2
 ---
+- APIs show below:
+```
+	Map<String, Object> queryForMap(String sql) throws SQLException;
+	Map<String, Object> queryForMap(String sql, Object[] args, int[] argTypes) throws SQLException;
+	<T> T queryForObject(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws SQLException;
+	<T> T queryForObject(String sql, Class<T> requiredType) throws SQLException;
+	<T> T queryForObject(String sql, Object[] args, int[] argTypes, Class<T> requiredType) throws SQLException;
+	<T> List<T> queryForList(String sql, Class<T> requiredType) throws SQLException;
+	<T> List<T> queryForList(String sql, Object[] args, int[] argTypes, Class<T> requiredType) throws SQLException;
+	<T> T queryForObject(String sql, RowMapper<T> rowMapper) throws SQLException;
+	<T> List<T> queryForList(String sql, RowMapper<T> rowMapper) throws SQLException;
+	<T> List<T> queryForList(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws SQLException;
+	boolean executeInsert(String sql, Object[] args, int[] argTypes) throws SQLException;
+	int executeUpdate(String sql, Object[] args, int[] argTypes) throws SQLException;
+	int executeUpdate(String sql) throws SQLException;
+	int executeDelete(String sql, Object[] args, int[] argTypes) throws SQLException;
+	int executeDelete(String sql) throws SQLException;
+```
 - Use client tool to connect to the database
 ```
 $ java -cp h2*.jar org.h2.tools.Shell

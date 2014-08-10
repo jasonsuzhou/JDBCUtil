@@ -6,9 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
+import com.mh.jdbc.util.ColumnMapRowMapper;
 import com.mh.jdbc.util.DBUtil;
 import com.mh.jdbc.util.RowMapper;
 import com.mh.jdbc.util.SingleColumnRowMapper;
@@ -33,6 +35,34 @@ public class JdbcTemplate implements JdbcOperations {
 			}
 		}
 		return conn;
+	}
+	
+	@Override
+	public Map<String, Object> queryForMap(String sql) throws SQLException {
+		return queryForObject(sql, getColumnMapRowMapper());
+	}
+	
+	@Override
+	public Map<String, Object> queryForMap(String sql, Object[] args, int[] argTypes) throws SQLException {
+		return queryForObject(sql, args, argTypes, this.getColumnMapRowMapper());
+	}
+	
+	@Override
+	public <T> T queryForObject(String sql, RowMapper<T> rowMapper) throws SQLException {
+		List<T> results = queryForList(sql, rowMapper);
+		return DBUtil.requiredSingleResult(results);
+	}
+	
+	@Override
+	public <T> T queryForObject(String sql, Object[] args, int[] argTypes, RowMapper<T> rowMapper) throws SQLException {
+		List<T> results = queryForList(sql, args, argTypes, rowMapper);
+		return DBUtil.requiredSingleResult(results);
+	}
+	
+	@Override
+	public <T> T queryForObject(String sql, Class<T> requiredType) throws SQLException {
+		List<T> lsResult = this.queryForList(sql, new SingleColumnRowMapper<T>(requiredType));
+		return DBUtil.requiredSingleResult(lsResult);
 	}
 	
 	@Override
@@ -141,6 +171,10 @@ public class JdbcTemplate implements JdbcOperations {
 			}
 		}
 		return pstmt;
+	}
+	
+	private RowMapper<Map<String, Object>> getColumnMapRowMapper() {
+		return new ColumnMapRowMapper();
 	}
 
 }

@@ -6,6 +6,7 @@ import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
@@ -183,6 +184,14 @@ public class DBUtil {
 			throw new SQLException("JdbcTemplate::Incorrect result size: expected 1, actual " + size);
 		}
 		return results.iterator().next();
+	}
+	
+	public static String lookupColumnName(ResultSetMetaData resultSetMetaData, int columnIndex) throws SQLException {
+		String name = resultSetMetaData.getColumnLabel(columnIndex);
+		if (name == null || name.length() < 1) {
+			name = resultSetMetaData.getColumnName(columnIndex);
+		}
+		return name;
 	}
 
 }
