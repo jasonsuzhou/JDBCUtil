@@ -36,11 +36,8 @@ public class DBUtil {
 
 	public static Connection getConnection(boolean isAutoCommit) throws SQLException {
 		Connection conn = null;
-		if ("H2".equalsIgnoreCase(Configure.getDbType())) {
-			conn = DriverManager.getConnection(Configure.getUrl());
-			conn.setAutoCommit(isAutoCommit);
-		}
-		// TODO
+		conn = DriverManager.getConnection(Configure.getUrl(), Configure.getUsername(), Configure.getPassword());
+		conn.setAutoCommit(isAutoCommit);
 		return conn;
 	}
 
