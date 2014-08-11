@@ -1,4 +1,4 @@
-JdbcTemplate with h2
+JdbcTemplate with H2 database
 ---
 - APIs show below:
 ```
