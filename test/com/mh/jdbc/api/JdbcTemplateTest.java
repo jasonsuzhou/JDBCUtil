@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mh.jdbc.api.JdbcTemplate;
+import com.mh.jdbc.util.Pager;
 
 public class JdbcTemplateTest {
 	private static JdbcTemplate jdbcTemplate = new JdbcTemplate(null);
@@ -52,6 +53,26 @@ public class JdbcTemplateTest {
 		Assert.assertEquals("jasonyao", results.get("username"));
 		Assert.assertEquals("test1234", results.get("PASS"));
 		Assert.assertEquals(27, Integer.parseInt(results.get("age").toString()));
+	}
+
+	@Test
+	public void queryForListMap() throws Exception {
+		String sql = "select username as UserName, password as pass, age from user where username=?";
+		Object[] args = new Object[] { "jasonyao" };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		List<Map<String, Object>> lsMap = jdbcTemplate.queryForListMap(sql, args, argTypes);
+		Assert.assertEquals(1, lsMap.size());
+		Map<String, Object> map = lsMap.get(0);
+		Assert.assertEquals("test1234", map.get("pass"));
+	}
+
+	@Test
+	public void queryForListMapWithNullParameters() throws Exception {
+		String sql = "select username as UserName, password as pass, age from user where username='jasonyao'";
+		List<Map<String, Object>> lsMap = jdbcTemplate.queryForListMap(sql);
+		Assert.assertEquals(1, lsMap.size());
+		Map<String, Object> map = lsMap.get(0);
+		Assert.assertEquals("test1234", map.get("pass"));
 	}
 
 	@Test
@@ -124,12 +145,94 @@ public class JdbcTemplateTest {
 		jdbcTemplate.queryForObject(sql, args, argTypes, Integer.class);
 	}
 
-	// This test method must be the last one
+	@Test
+	public void queryForInt() throws Exception {
+		String sql = "select age from user where username=?";
+		Object[] args = new Object[] { "jasonyao" };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		int age = jdbcTemplate.queryForInt(sql, args, argTypes);
+		Assert.assertEquals(27, age);
+	}
+
+	@Test
+	public void queryForLongWithNullParameters() throws Exception {
+		String sql = "select count(*) from user";
+		long total = jdbcTemplate.queryForLong(sql);
+		Assert.assertEquals(1, total);
+	}
+
+	@Test
+	public void queryForLong() throws Exception {
+		String sql = "select age from user where username=?";
+		Object[] args = new Object[] { "jasonyao" };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		long age = jdbcTemplate.queryForLong(sql, args, argTypes);
+		Assert.assertEquals(27, age);
+	}
+
+	@Test
+	public void queryForDoubleWithNullParameters() throws Exception {
+		String sql = "select count(*) from user";
+		double total = jdbcTemplate.queryForDouble(sql);
+		Assert.assertEquals(1.0, total);
+	}
+
+	@Test
+	public void queryForDouble() throws Exception {
+		String sql = "select age from user where username=?";
+		Object[] args = new Object[] { "jasonyao" };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		double age = jdbcTemplate.queryForDouble(sql, args, argTypes);
+		Assert.assertEquals(27.0, age);
+	}
+
+	@Test
+	public void queryForIntWithNullParameters() throws Exception {
+		String sql = "select count(*) from user";
+		int total = jdbcTemplate.queryForInt(sql);
+		Assert.assertEquals(1, total);
+	}
+
 	@Test
 	public void executeDelete() throws Exception {
 		String sql = "delete from user";
 		int affectRows = jdbcTemplate.executeDelete(sql);
 		Assert.assertEquals(1, affectRows);
+	}
+
+	@Test
+	public void queryForPagerWithNullParameters() throws Exception {
+		this.prepareMultiRecords(32);
+		String selectSQL = "select username, password, age, balance, birthday from user limit 10 offset 10";
+		String countSQL = "select count(*) from user";
+		Pager<User> pagerUser = jdbcTemplate.queryForPager(selectSQL, countSQL, new User());
+		Assert.assertEquals(pagerUser.getTotalCount(), 32);
+		for (User user : pagerUser.getResultSet()) {
+			System.out.println(user.getUsername());
+		}
+	}
+
+	@Test
+	public void queryForPager() throws Exception {
+		String selectSQL = "select username, password, age, balance, birthday from user where username like ? limit 10 offset 10";
+		String countSQL = "select count(*) from user where username like ?";
+		Object[] args = new Object[] { "%jasonyao%" };
+		int[] argTypes = new int[] { Types.VARCHAR };
+		Pager<User> pagerUser = jdbcTemplate.queryForPager(selectSQL, countSQL, args, argTypes, new User());
+		Assert.assertEquals(pagerUser.getTotalCount(), 32);
+		for (User user : pagerUser.getResultSet()) {
+			System.out.println(user.getUsername());
+		}
+	}
+
+	private void prepareMultiRecords(int number) throws Exception {
+		String sql = "insert into user(username, password, age, balance, birthday) values(?,?,?,?,?)";
+		for (int i = 0; i < number; i++) {
+			Object[] args = new Object[] { "jasonyao" + i, "test1234", 27, 123434,
+					new java.sql.Date(new Date().getTime()) };
+			int[] argTypes = new int[] { Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.NUMERIC, Types.DATE };
+			jdbcTemplate.executeInsert(sql, args, argTypes);
+		}
 	}
 
 }
