@@ -1,4 +1,4 @@
-JdbcTemplate with H2 database
+JdbcTemplate (JUNIT using H2 database to test)
 ---
 - APIs show below:
 ```
