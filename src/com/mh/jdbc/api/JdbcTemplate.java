@@ -25,15 +25,14 @@ public class JdbcTemplate implements JdbcOperations {
 
 	public Connection getConnection() {
 		Connection conn = null;
-		if (this.dataSrouce == null) {
-			conn = DBUtil.getConnection();
-		} else {
-			try {
+		try {
+			if (this.dataSrouce == null) {
+				conn = DBUtil.getConnection();
+			} else {
 				conn = this.dataSrouce.getConnection();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
+		} catch (SQLException e) {
+			// do nothing
 		}
 		return conn;
 	}

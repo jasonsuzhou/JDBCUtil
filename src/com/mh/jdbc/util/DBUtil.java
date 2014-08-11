@@ -12,84 +12,65 @@ import java.sql.Statement;
 import java.util.Collection;
 
 public class DBUtil {
-	public static final String H2_DRIVER_CLASS_NAME = "org.h2.Driver";
-	public static final String H2_CONNECTION_URL = "jdbc:h2:./h2demo";
 
 	static {
 		try {
-			Class.forName(H2_DRIVER_CLASS_NAME);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Configure.initConfig();
+			Class.forName(Configure.getDriverClassName());
+		} catch (Exception e) {
+			// do nothing
 		}
 	}
 
-	public static Connection getConnection() {
+	public static Connection getConnection() throws SQLException {
 		return getConnection(true);
 	}
 
-	public static Connection getConnectionWithAutoCommit() {
+	public static Connection getConnectionWithAutoCommit() throws SQLException {
 		return getConnection(true);
 	}
 
-	public static Connection getConnectionWithMannualCommit() {
+	public static Connection getConnectionWithMannualCommit() throws SQLException {
 		return getConnection(false);
 	}
 
-	public static Connection getConnection(boolean isAutoCommit) {
+	public static Connection getConnection(boolean isAutoCommit) throws SQLException {
 		Connection conn = null;
-		try {
-			conn = DriverManager.getConnection(H2_CONNECTION_URL);
+		if ("H2".equalsIgnoreCase(Configure.getDbType())) {
+			conn = DriverManager.getConnection(Configure.getUrl());
 			conn.setAutoCommit(isAutoCommit);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		// TODO
 		return conn;
 	}
 
-	public static void closeConn(Connection conn) {
+	public static void closeConn(Connection conn) throws SQLException {
 		if (conn != null) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			conn.close();
 			conn = null;
 		}
 	}
 
-	public static void closeStmt(Statement stmt) {
+	public static void closeStmt(Statement stmt) throws SQLException {
 		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			stmt.close();
 			stmt = null;
 		}
 	}
 
-	public static void closeRs(ResultSet rs) {
+	public static void closeRs(ResultSet rs) throws SQLException {
 		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			rs.close();
 			rs = null;
 		}
 	}
 
-	public static void closeConnAndStmt(Connection conn, Statement stmt) {
+	public static void closeConnAndStmt(Connection conn, Statement stmt) throws SQLException {
 		closeStmt(stmt);
 		closeConn(conn);
 	}
 
-	public static void closeAll(Connection conn, Statement stmt, ResultSet rs) {
+	public static void closeAll(Connection conn, Statement stmt, ResultSet rs) throws SQLException {
 		closeRs(rs);
 		closeConnAndStmt(conn, stmt);
 	}
@@ -177,7 +158,7 @@ public class DBUtil {
 		}
 		return obj;
 	}
-	
+
 	public static <T> T requiredSingleResult(Collection<T> results) throws SQLException {
 		int size = (results != null ? results.size() : 0);
 		if (size != 1) {
@@ -185,7 +166,7 @@ public class DBUtil {
 		}
 		return results.iterator().next();
 	}
-	
+
 	public static String lookupColumnName(ResultSetMetaData resultSetMetaData, int columnIndex) throws SQLException {
 		String name = resultSetMetaData.getColumnLabel(columnIndex);
 		if (name == null || name.length() < 1) {
