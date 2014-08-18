@@ -129,7 +129,7 @@ public class JdbcTemplate implements JdbcOperations {
 		try {
 			conn = this.getConnection();
 			pstmt = this.prepareStatement(sql, args, argTypes, conn);
-			success = pstmt.execute();
+			success = pstmt.executeUpdate() == 1;
 		} catch (Exception e) {
 			throw e;
 		} finally {
