@@ -19,7 +19,7 @@ public class SingleColumnRowMapper<T> implements RowMapper<T> {
 		if (nrOfColumns != 1) {
 			throw new SQLException("JdbcTemplate::Incorrect column count: expected " + 1 + ", actual " + nrOfColumns);
 		}
-		return (T) this.getColumnValue(rs, rowNum, requiredType);
+		return (T) this.getColumnValue(rs, 1, requiredType);
 	}
 	
 	private Object getColumnValue(ResultSet rs, int index, Class<T> requiredType) throws SQLException {
