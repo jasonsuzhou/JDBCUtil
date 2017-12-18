@@ -17,22 +17,64 @@ import com.mh.jdbc.util.RowMapper;
 import com.mh.jdbc.util.SingleColumnRowMapper;
 
 public class JdbcTemplate implements JdbcOperations {
-	private DataSource dataSrouce = null;
+	private DataSource dataSource = null;
 
-	public JdbcTemplate(DataSource dataSource) {
-		this.dataSrouce = dataSource;
+	public JdbcTemplate() {
+
 	}
 
+	public JdbcTemplate(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	/**
+	 * 提供set方法，这样第三方的框架可以进行注入
+	 * 
+	 * @param dataSrouce
+	 */
+	public void setDataSource(DataSource dataSource) {
+		if (dataSource == null) {
+			this.dataSource = dataSource;
+		}
+	}
+
+	/**
+	 * 默认拿到的是自动提交的Connection
+	 * 
+	 * @return
+	 */
 	public Connection getConnection() {
 		Connection conn = null;
 		try {
-			if (this.dataSrouce == null) {
-				conn = DBUtil.getConnection();
-			} else {
-				conn = this.dataSrouce.getConnection();
+			conn = DBUtil.getConnection(dataSource);
+			if (!conn.getAutoCommit()) {
+				conn.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
-			// do nothing
+			e.printStackTrace();
+		}
+		return conn;
+	}
+
+	public Connection getConnection(boolean autoCommit) {
+		Connection conn = null;
+		try {
+			conn = DBUtil.getConnection(dataSource);
+			if (autoCommit) {
+				if (!conn.getAutoCommit()) {
+					conn.setAutoCommit(autoCommit);
+				}
+			} else {
+				if (conn.getAutoCommit()) {
+					conn.setAutoCommit(autoCommit);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 		return conn;
 	}
@@ -256,4 +298,42 @@ public class JdbcTemplate implements JdbcOperations {
 		return this.queryForPager(selectSQL, countSQL, null, null, rowMapper);
 	}
 
+	@Override
+	public void prepareForBatch(PreparedStatement pstmt, Object[] args, int[] argTypes) throws SQLException {
+		if (args != null) {
+			int temp = 1;
+			for (Object arg : args) {
+				pstmt.setObject(temp, arg, argTypes[temp - 1]);
+				temp++;
+			}
+		}
+		pstmt.addBatch();
+	}
+
+	@Override
+	public void executeForBatch(String sql, List<Object[]> listArgs, int[] argTypes) throws SQLException {
+		if (listArgs != null && !listArgs.isEmpty()) {
+			Connection conn = null;
+			PreparedStatement pstmt = null;
+			try {
+				conn = this.getConnection(true);
+				pstmt = conn.prepareStatement(sql);
+				for (Object[] args : listArgs) {
+					int temp = 1;
+					for (Object arg : args) {
+						pstmt.setObject(temp, arg, argTypes[temp - 1]);
+						temp++;
+					}
+					pstmt.addBatch();
+					temp = 1;
+				}
+				pstmt.executeBatch();
+			} catch (SQLException e) {
+				throw e;
+			} finally {
+				DBUtil.closeConnAndStmt(conn, pstmt);
+			}
+		}
+
+	}
 }

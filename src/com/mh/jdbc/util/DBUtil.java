@@ -4,15 +4,17 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 
+import javax.sql.DataSource;
+
 public class DBUtil {
 
+	/*
 	static {
 		try {
 			Configure.initConfig();
@@ -21,24 +23,21 @@ public class DBUtil {
 			// do nothing
 		}
 	}
+	/*
 
-	public static Connection getConnection() throws SQLException {
-		return getConnection(true);
-	}
-
-	public static Connection getConnectionWithAutoCommit() throws SQLException {
-		return getConnection(true);
-	}
-
-	public static Connection getConnectionWithMannualCommit() throws SQLException {
-		return getConnection(false);
-	}
-
-	public static Connection getConnection(boolean isAutoCommit) throws SQLException {
-		Connection conn = null;
-		conn = DriverManager.getConnection(Configure.getUrl(), Configure.getUsername(), Configure.getPassword());
-		conn.setAutoCommit(isAutoCommit);
-		return conn;
+	/**
+	 * 根据数据源获得连接对象，这样多数据源的话可以灵活获取
+	 * 
+	 * @param dataSource
+	 * @return
+	 * @throws SQLException
+	 */
+	public static Connection getConnection(DataSource dataSource) throws SQLException {
+		if (dataSource != null) {
+			return dataSource.getConnection();
+		} else {
+			throw new SQLException("input dataSource cannot be null");
+		}
 	}
 
 	public static void closeConn(Connection conn) throws SQLException {

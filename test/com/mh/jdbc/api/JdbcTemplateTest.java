@@ -6,12 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.mh.jdbc.api.JdbcTemplate;
 import com.mh.jdbc.util.Pager;
 
 public class JdbcTemplateTest {

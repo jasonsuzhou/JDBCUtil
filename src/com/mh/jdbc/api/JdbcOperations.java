@@ -1,5 +1,6 @@
 package com.mh.jdbc.api;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -59,5 +60,9 @@ public interface JdbcOperations {
 			throws SQLException;
 
 	<T> Pager<T> queryForPager(String selectSQL, String countSQL, RowMapper<T> rowMapper) throws SQLException;
+	
+	void prepareForBatch(PreparedStatement pstmt, Object[] args, int[] argTypes) throws SQLException;
+	
+	void executeForBatch(String sql, List<Object[]> listArgs, int[] argTypes) throws SQLException;
 
 }
