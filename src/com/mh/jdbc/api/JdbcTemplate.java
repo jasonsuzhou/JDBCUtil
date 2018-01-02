@@ -172,7 +172,7 @@ public class JdbcTemplate implements JdbcOperations {
 			conn = this.getConnection();
 			pstmt = this.prepareStatement(sql, args, argTypes, conn);
 			success = pstmt.executeUpdate() == 1;
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			throw e;
 		} finally {
 			DBUtil.closeConnAndStmt(conn, pstmt);
@@ -189,7 +189,7 @@ public class JdbcTemplate implements JdbcOperations {
 			conn = this.getConnection();
 			pstmt = this.prepareStatement(sql, args, argTypes, conn);
 			affectRows = pstmt.executeUpdate();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			throw e;
 		} finally {
 			DBUtil.closeConnAndStmt(conn, pstmt);
