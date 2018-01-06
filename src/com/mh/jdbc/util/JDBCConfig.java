@@ -19,20 +19,13 @@ public class JDBCConfig implements Serializable {
 	 */
 	private String url;
 	private String driverClassName;
+	
+	public JDBCConfig() {}
 
 	public JDBCConfig(String username, String password, String url) {
 		this.url = url;
 		this.username = username;
 		this.password = password;
-		if (url != null) {
-			if (url.contains("mysql")) {
-				this.driverClassName = "com.mysql.jdbc.Driver";
-			} else if (url.contains("oracle")) {
-				this.driverClassName = "oracle.jdbc.driver.OracleDriver";
-			} else if (url.contains("sqlserver")) {
-				this.driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-			}
-		}
 	}
 
 	/**
@@ -95,6 +88,15 @@ public class JDBCConfig implements Serializable {
 	}
 
 	public String getDriverClassName() {
+		if (url != null) {
+			if (url.contains("mysql")) {
+				this.driverClassName = "com.mysql.jdbc.Driver";
+			} else if (url.contains("oracle")) {
+				this.driverClassName = "oracle.jdbc.driver.OracleDriver";
+			} else if (url.contains("sqlserver")) {
+				this.driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+			}
+		}
 		return driverClassName;
 	}
 
